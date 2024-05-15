@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Royal Flip</title>
+<style>
+    body {
+        font-family: monospace, Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #c9e7f0; /* Light blue background color */
+    }
+
+    .container {
+        text-align: center;
+        background-color: #fff; /* White background color */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    }
+
+    h1 {
+        color: #333; /* Dark text color */
+    }
+
+    .balance {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .result {
+        font-size: 20px;
+        margin-top: 20px;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin-top: 20px;
+        cursor: pointer;
+        background-color: #4CAF50; /* Green */
+        color: white; /* White text color */
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease; /* Smooth transition */
+    }
+
+    button:hover {
+        background-color: #45a049; /* Darker green on hover */
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Royal Flip Game</h1>
+    <div class="balance" id="balance">Balance: SOL <span id="sol-balance">1</span></div>
+    <button id="connect-wallet">Connect Wallet</button>
+    <label for="bet">Bet (Heads or Tails):</label>
+    <input type="text" id="bet" placeholder="Enter bet">
+    <br>
+    <label for="amount">Amount:</label>
+    <input type="number" id="amount" placeholder="Enter amount">
+    <br>
+    <button onclick="flipCoin()">Flip Coin</button>
+    <div class="result" id="result"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/solana-web3.js/1.31.0/solana-web3.min.js"></script>
+<script src="https://unpkg.com/@solana/wallet-adapter-wallets@0.7.6/lib/index.umd.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const { clusterApiUrl, Connection } = solanaWeb3;
+        const { PhantomWalletAdapter } = solanaWalletAdapterWallets;
+
+        let wallet;
+
+        const connectWalletButton = document.getElementById("connect-wallet");
+        const solBalanceElement = document.getElementById("sol-balance");
+
+        connectWalletButton.addEventListener("click", async () => {
+            try {
+                const network = clusterApiUrl('mainnet-beta');
+                const connection = new Connection(network);
+                wallet = new PhantomWalletAdapter();
+
+                await wallet.connect();
+
+                alert("Wallet connected: " + wallet.publicKey.toString());
+
+                const publicKey = wallet.publicKey;
+                const balance = await connection.getBalance(publicKey);
+                solBalanceElement.textContent = (balance / 1e9).toFixed(2); // Convert lamports to SOL
+            } catch (err) {
+                console.error("Error connecting to wallet:", err);
+                alert("Failed to connect wallet");
+            }
+        });
+    });
+</script>
+</body>
+</html>
